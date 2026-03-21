@@ -1,18 +1,30 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { reportService } from "../../services/report.service";
+import { useAuth } from "../../context/AuthContext";
 
 const DashboardConductor = () => {
+  const { user } = useAuth();
   const [rutaActiva, setRutaActiva] = useState(false);
   const [progreso, setProgreso] = useState(0);
   const [reportes, setReportes] = useState([]);
 
-  useEffect(() => {
+  const cargarReportes = useCallback(() => {
+    if (!user?.email) return;
+
     const asignados = reportService
       .getAll()
-      .filter(r => r.estado === "Asignado" || r.estado === "En ruta");
+      .filter(
+        (r) =>
+          (r.estado === "Asignado" || r.estado === "En ruta") &&
+          r.conductor === user.email
+      );
 
     setReportes(asignados);
-  }, []);
+  }, [user]);
+
+  useEffect(() => {
+    cargarReportes();
+  }, [cargarReportes]);
 
   const iniciarRuta = () => {
     setRutaActiva(true);
@@ -20,24 +32,22 @@ const DashboardConductor = () => {
   };
 
   const avanzar = () => {
-    if (progreso < 100) {
-      setProgreso(prev => prev + 20);
-      setProgreso(prev => Math.min(prev + 20,100));
-    }
+    setProgreso((prev) => Math.min(prev + 20, 100));
   };
 
   const finalizarRuta = () => {
-    reportes.forEach((_, i) => {
-      reportService.completeReport(i);
+    reportes.forEach((r) => {
+      reportService.completeReport(r.id);
     });
 
     setRutaActiva(false);
     setProgreso(100);
+
+    cargarReportes(); 
   };
 
   return (
     <div className="space-y-6">
-
       <h1 className="text-2xl font-semibold">
         Panel del conductor
       </h1>
@@ -78,7 +88,7 @@ const DashboardConductor = () => {
             </button>
           )}
 
-          {progreso >= 100 && (
+          {rutaActiva && progreso >= 100 && (
             <button
               onClick={finalizarRuta}
               className="bg-green-600 text-white px-4 py-2 rounded"
@@ -101,9 +111,9 @@ const DashboardConductor = () => {
           </p>
         ) : (
           <ul className="space-y-3">
-            {reportes.map((r, i) => (
+            {reportes.map((r) => (
               <li
-                key={i}
+                key={r.id}
                 className="border-b pb-2 flex justify-between"
               >
                 <div>
