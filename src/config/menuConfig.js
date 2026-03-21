@@ -3,7 +3,6 @@ export const menuConfig = {
     { label: "Dashboard", path: "/admin" },
     { label: "Usuarios", path: "/admin/usuarios" },
     { label: "Reportes", path: "/admin/reportes" },
-    { label: "Rutas", path: "/admin/rutas" },
   ],
 
   CIUDADANO: [

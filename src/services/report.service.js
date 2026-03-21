@@ -11,20 +11,37 @@ export const reportService = {
 
   assignReport(id, conductor) {
     const reportes = getAll();
-    reportes[id].estado = "Asignado";
-    reportes[id].conductor = conductor;
-    save(reportes);
+
+    const updated = reportes.map((r) =>
+      r.id === id
+        ? { ...r, estado: "Asignado", conductor }
+        : r
+    );
+
+    save(updated);
   },
 
   startRoute(id) {
     const reportes = getAll();
-    reportes[id].estado = "En ruta";
-    save(reportes);
+
+    const updated = reportes.map((r) =>
+      r.id === id
+        ? { ...r, estado: "En ruta" }
+        : r
+    );
+
+    save(updated);
   },
 
   completeReport(id) {
     const reportes = getAll();
-    reportes[id].estado = "Recolectado";
-    save(reportes);
+
+    const updated = reportes.map((r) =>
+      r.id === id
+        ? { ...r, estado: "Recolectado" }
+        : r
+    );
+
+    save(updated);
   },
 };
