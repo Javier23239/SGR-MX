@@ -24,7 +24,7 @@ const DashboardConductor = () => {
       const tareas = await reportService.getTasksByEmail(user.email);
       setReportes(tareas);
       
-      const hayRutaEnCurso = tareas.some(t => t.estado === 'En ruta');
+      const hayRutaEnCurso = tareas.some(t => t.ESTADO === 'En ruta');
       if (hayRutaEnCurso) {
         setRutaActiva(true);
         if (progreso === 0) setProgreso(30); 
@@ -41,13 +41,13 @@ const DashboardConductor = () => {
   const iniciarRuta = async () => {
     try {
       for (const r of reportes) {
-        await reportService.updateStatus(r.id, 'En ruta');
+        await reportService.updateStatus(r.ID_SOLICITUD, 'En ruta');
       }
       setRutaActiva(true);
       setProgreso(15);
-      cargarReportes();
+      await cargarReportes();
     } catch (error) {
-      alert("Error al iniciar ruta");
+      alert("Error al iniciar ruta. Revisa la consola.");
     }
   };
 
@@ -56,12 +56,12 @@ const DashboardConductor = () => {
   const finalizarRuta = async () => {
     try {
       for (const r of reportes) {
-        await reportService.updateStatus(r.id, 'Completada');
+        await reportService.updateStatus(r.ID_SOLICITUD, 'Completada');
       }
       setRutaActiva(false);
       setProgreso(0);
       alert("¡Misión cumplida! Ruta guardada en Oracle.");
-      cargarReportes();
+      await cargarReportes();
     } catch (error) {
       console.error("Error al finalizar:", error);
     }
@@ -78,7 +78,7 @@ const DashboardConductor = () => {
           </div>
           <div>
             <h1 className="text-xl font-black text-gray-800">Panel de Ruta</h1>
-            <p className="text-xs text-gray-500 font-medium uppercase tracking-widest">{user?.nombre || 'Operador'}</p>
+            <p className="text-xs text-gray-500 font-medium uppercase tracking-widest">{user?.email || 'Operador'}</p>
           </div>
         </div>
         <div className="text-right hidden sm:block">
@@ -101,7 +101,6 @@ const DashboardConductor = () => {
           <p className="text-2xl font-black text-blue-600">{progreso}%</p>
         </div>
 
-        {/* Barra de Progreso Estilizada */}
         <div className="w-full bg-gray-100 h-4 rounded-full overflow-hidden border border-gray-50">
           <div
             className="bg-gradient-to-r from-blue-500 to-indigo-600 h-full rounded-full transition-all duration-700 ease-out shadow-inner"
@@ -109,7 +108,6 @@ const DashboardConductor = () => {
           />
         </div>
 
-        {/* Botonera de Acción */}
         <div className="mt-8 flex flex-wrap gap-4">
           {!rutaActiva && reportes.length > 0 ? (
             <button 
@@ -155,33 +153,33 @@ const DashboardConductor = () => {
             </div>
           ) : (
             reportes.map((r) => (
-              <div key={r.id} className="p-5 flex items-start justify-between hover:bg-gray-50/50 transition-colors group">
+              <div key={r.ID_SOLICITUD} className="p-5 flex items-start justify-between hover:bg-gray-50/50 transition-colors group">
                 <div className="flex gap-4">
                   <div className={`mt-1 w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm ${
-                    r.estado === 'En ruta' ? 'bg-amber-100 text-amber-600' : 'bg-blue-50 text-blue-500'
+                    r.ESTADO === 'En ruta' ? 'bg-amber-100 text-amber-600' : 'bg-blue-50 text-blue-500'
                   }`}>
                     <RiMapPinRangeLine size={20} />
                   </div>
                   <div className="min-w-0">
                     <p className="font-black text-gray-800 truncate text-sm">
-                      {r.tipo || "Recolección General"}
+                      Reporte #{r.ID_SOLICITUD}
                     </p>
                     <p className="text-xs text-blue-600 font-bold mt-0.5 flex items-center gap-1">
-                      {r.ubicacion}
+                      {r.DIRECCION || "Ubicación pendiente"}
                     </p>
                     <p className="text-[11px] text-gray-400 mt-1 line-clamp-1 italic">
-                      {r.descripcion || 'Sin observaciones adicionales'}
+                      {r.DESCRIPCION || 'Sin observaciones adicionales'}
                     </p>
                   </div>
                 </div>
                 
                 <div className="flex flex-col items-end gap-2 shrink-0">
                   <span className={`text-[9px] font-black px-2 py-1 rounded-md uppercase tracking-tighter border ${
-                    r.estado === 'En ruta' 
+                    r.ESTADO === 'En ruta' 
                     ? 'bg-amber-50 text-amber-600 border-amber-100' 
                     : 'bg-blue-50 text-blue-600 border-blue-100'
                   }`}>
-                    {r.estado}
+                    {r.ESTADO}
                   </span>
                   <RiArrowRightSLine className="text-gray-300 group-hover:text-blue-400 transition-colors" />
                 </div>

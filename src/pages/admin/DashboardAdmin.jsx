@@ -77,7 +77,7 @@ const DashboardAdmin = () => {
         </div>
       </div>
 
-      {/* Grid de Stats Responsivo */}
+      {/* Etadisticas */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, index) => (
           <div key={index} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:scale-[1.02] transition-transform duration-300">
@@ -90,7 +90,7 @@ const DashboardAdmin = () => {
         ))}
       </div>
 
-      {/* Actividad Reciente Responsiva */}
+      {/* Actividad Reciente */}
       <div className="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100">
         <div className="flex items-center gap-2 mb-8">
           <RiDashboard3Line className="text-emerald-600 text-2xl" />
@@ -139,7 +139,7 @@ const DashboardAdmin = () => {
   );
 };
 
-/* 🔹 Badge de Estado para Admin */
+/* Estado Admin */
 const AdminEstadoBadge = ({ estado }) => {
   const styles = {
     Pendiente: "bg-amber-100 text-amber-700 border-amber-200",

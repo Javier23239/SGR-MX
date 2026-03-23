@@ -1,3 +1,10 @@
+import { 
+  RiNavigationFill,
+  RiDashboardLine, 
+  RiRouteLine, 
+  RiHistoryLine 
+} from "react-icons/ri";
+
 export const menuConfig = {
   ADMIN: [
     { label: "Dashboard", path: "/admin" },
@@ -11,9 +18,27 @@ export const menuConfig = {
     { label: "Nuevo reporte", path: "/ciudadano/reportes/nuevo" },
   ],
 
-  CONDUCTOR: [
-    { label: "Dashboard", path: "/conductor" },
-    { label: "Rutas asignadas", path: "/conductor/rutas" },
-    { label: "Historial", path: "/conductor/historial" },
+
+  RECOLECTOR: [
+    { 
+      label: "Dashboard", 
+      path: "/conductor", 
+      icon: RiDashboardLine 
+    },
+    { 
+      label: "Rutas asignadas", 
+      path: "/conductor/rutas", 
+      icon: RiRouteLine 
+    },
+    { 
+      label: "Historial", 
+      path: "/conductor/historial", 
+      icon: RiHistoryLine 
+    },
+    {
+  label: "Mapa de Ruta", 
+  path: "/conductor/mapa", 
+  icon: RiNavigationFill 
+},
   ],
 };

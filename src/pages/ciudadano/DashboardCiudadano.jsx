@@ -36,7 +36,7 @@ const DashboardCiudadano = () => {
     }
   }, [user]);
 
-  // Lógica de métricas robusta (soporta Mayúsculas/Minúsculas)
+  
   const total = reportes.length;
   const pendientes = reportes.filter(r => (r.ESTADO || r.estado) === "Pendiente").length;
   const enProceso = reportes.filter(r => ["Asignado", "En ruta"].includes(r.ESTADO || r.estado)).length;
@@ -54,7 +54,7 @@ const DashboardCiudadano = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-8 animate-fadeIn">
       
-      {/* Header con Bienvenida */}
+      {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
         <div>
           <h1 className="text-3xl font-black text-gray-800 flex items-center gap-3">
@@ -71,7 +71,7 @@ const DashboardCiudadano = () => {
         </Link>
       </div>
 
-      {/* Grid de Métricas */}
+      {/* Estadisticas */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <MetricCard title="Total Solicitudes" value={total} icon={<RiHistoryLine/>} color="text-gray-600" bg="bg-gray-50" />
         <MetricCard title="Pendientes" value={pendientes} icon={<RiTimeLine/>} color="text-amber-600" bg="bg-amber-50" />
@@ -79,10 +79,10 @@ const DashboardCiudadano = () => {
         <MetricCard title="Completados" value={completados} icon={<RiCheckboxCircleLine/>} color="text-emerald-600" bg="bg-emerald-50" />
       </div>
 
-      {/* Sección Principal: Actividad e Info */}
+      {/* Actividad */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-       {/* Lista de Actividad Reciente */}
+       {/* Lista de Actividad  */}
 <div className="lg:col-span-2 bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100">
   <div className="flex justify-between items-center mb-6">
     <h2 className="font-black text-gray-800 text-xl flex items-center gap-2">
@@ -104,7 +104,7 @@ const DashboardCiudadano = () => {
           key={r.ID_SOLICITUD || r.id} 
           className="group flex flex-col sm:flex-row sm:items-center justify-between p-4 hover:bg-emerald-50/50 rounded-2xl transition-all border border-transparent hover:border-emerald-100 gap-4"
         >
-          <div className="flex-1 min-w-0"> {/* min-w-0 permite que el truncate funcione en flex */}
+          <div className="flex-1 min-w-0"> 
             <p className="font-bold text-gray-800 group-hover:text-emerald-700 transition-colors truncate text-sm md:text-base">
               {(r.DESCRIPCION || r.descripcion || "Sin descripción").split('|')[0].replace('[','').replace(']','')}
             </p>
@@ -118,7 +118,6 @@ const DashboardCiudadano = () => {
             </div>
           </div>
           
-          {/* Contenedor del Badge para que no se estire en móvil */}
           <div className="flex justify-start sm:justify-end">
             <EstadoBadge estado={r.ESTADO || r.estado} />
           </div>
@@ -128,7 +127,6 @@ const DashboardCiudadano = () => {
   )}
 </div>
 
-        {/* Card de Información Técnica / Estado DB */}
         <div className="bg-emerald-900 p-8 rounded-3xl shadow-xl text-white relative overflow-hidden">
           <div className="relative z-10">
             <div className="bg-emerald-800 w-12 h-12 rounded-2xl flex items-center justify-center mb-6 shadow-inner">
@@ -149,7 +147,6 @@ const DashboardCiudadano = () => {
               </div>
             </div>
           </div>
-          {/* Decoración */}
           <div className="absolute bottom-0 right-0 -mb-10 -mr-10 w-40 h-40 bg-emerald-800 rounded-full opacity-30"></div>
         </div>
 
@@ -158,7 +155,6 @@ const DashboardCiudadano = () => {
   );
 };
 
-/* 🔹 Componentes internos refinados */
 
 const MetricCard = ({ title, value, icon, color, bg }) => (
   <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:scale-[1.02] transition-transform duration-300">

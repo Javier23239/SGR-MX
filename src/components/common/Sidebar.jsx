@@ -11,7 +11,6 @@ const Sidebar = ({ open, close }) => {
 
   return (
     <>
-      {/* Overlay móvil con desenfoque */}
       {open && (
         <div
           className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-30 md:hidden transition-opacity"
@@ -32,7 +31,7 @@ const Sidebar = ({ open, close }) => {
           md:translate-x-0
         `}
       >
-        {/* Header del Sidebar (Solo visible en móvil para cerrar) */}
+        {/* Header */}
         <div className="p-6 flex items-center gap-3 md:hidden">
           <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-100">
             <RiLeafLine className="text-xl" />
@@ -41,7 +40,7 @@ const Sidebar = ({ open, close }) => {
         </div>
 
         <div className="px-4 py-6">
-          {/* Badge de Rol del Usuario */}
+          {/* Rol del Usuario */}
           <div className="mb-8 px-4 py-3 bg-gray-50 rounded-2xl border border-gray-100 flex items-center gap-3">
              <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center shadow-sm text-emerald-600">
                 <RiUserLine />
@@ -69,13 +68,12 @@ const Sidebar = ({ open, close }) => {
                   }`
                 }
               >
-                {/* Si tu menuConfig tiene iconos, se renderizarán aquí */}
                 {item.icon && (
                   <item.icon className={`text-xl transition-transform group-hover:scale-110`} />
                 )}
                 <span>{item.label}</span>
                 
-                {/* Indicador activo visual */}
+                {/* Indicador activo  */}
                 <div className="ml-auto">
                    <div className={`w-1.5 h-1.5 rounded-full bg-emerald-500 opacity-0 transition-opacity active-dot`} />
                 </div>
@@ -84,13 +82,12 @@ const Sidebar = ({ open, close }) => {
           </nav>
         </div>
 
-        {/* Footer del Sidebar (Opcional) */}
+        {/* Footer del Sidebar  */}
         <div className="absolute bottom-0 left-0 w-full p-6 border-t border-gray-50">
            <p className="text-[10px] text-gray-300 font-bold text-center uppercase tracking-widest">Oracle Cloud Infrastructure</p>
         </div>
       </aside>
       
-      {/* Estilos CSS adicionales para el punto activo */}
       <style dangerouslySetInnerHTML={{ __html: `
         .active.group .active-dot { opacity: 1 !important; }
       `}} />

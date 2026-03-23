@@ -5,7 +5,7 @@ const RegistrarUsuario = ({ onUsuarioRegistrado }) => {
     nombre: "",
     apellido: "",
     email: "",
-    password: "", // <--- Nuevo campo para la contraseña
+    password: "", 
     direccion: "",
     telefono: "",
     rol: "VECINO"
@@ -30,12 +30,11 @@ const RegistrarUsuario = ({ onUsuarioRegistrado }) => {
       if (response.ok) {
         alert(`✅ ${formData.rol} registrado con éxito en Oracle`);
         
-        // Limpiamos el formulario incluyendo el nuevo campo
         setFormData({ 
           nombre: "", 
           apellido: "", 
           email: "", 
-          password: "", // Limpiar clave
+          password: "", 
           direccion: "", 
           telefono: "", 
           rol: "VECINO" 
@@ -43,10 +42,10 @@ const RegistrarUsuario = ({ onUsuarioRegistrado }) => {
 
         onUsuarioRegistrado(); 
       } else {
-        alert("❌ Error de Oracle: " + data.error);
+        alert("Error de Oracle: " + data.error);
       }
     } catch (error) {
-      alert("⚠️ No se pudo conectar con el servidor backend");
+      alert("No se pudo conectar con el servidor backend");
     }
   };
 
@@ -91,7 +90,7 @@ const RegistrarUsuario = ({ onUsuarioRegistrado }) => {
           />
         </div>
 
-        {/* Email / Usuario */}
+        {/* Correo */}
         <div>
           <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Email / Usuario</label>
           <input
@@ -105,7 +104,7 @@ const RegistrarUsuario = ({ onUsuarioRegistrado }) => {
           />
         </div>
 
-        {/* CONTRASEÑA - NUEVO CAMPO */}
+        {/* Contra*/}
         <div>
           <label className="block text-xs font-bold text-gray-500 uppercase mb-1 text-blue-600">Contraseña de acceso</label>
           <input
@@ -119,7 +118,7 @@ const RegistrarUsuario = ({ onUsuarioRegistrado }) => {
           />
         </div>
 
-        {/* Dirección */}
+        {/* Direccion */}
         <div>
           <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Dirección</label>
           <input
@@ -135,7 +134,7 @@ const RegistrarUsuario = ({ onUsuarioRegistrado }) => {
           />
         </div>
 
-        {/* Teléfono */}
+        {/* Telefono */}
         <div>
           <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Teléfono</label>
           <input
@@ -151,7 +150,7 @@ const RegistrarUsuario = ({ onUsuarioRegistrado }) => {
           />
         </div>
 
-        {/* Rol y Botón */}
+        {/* Rol */}
         <div className="grid grid-cols-2 gap-4 items-end">
           <div>
             <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Rol</label>

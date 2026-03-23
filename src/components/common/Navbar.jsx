@@ -18,7 +18,6 @@ const Navbar = ({ toggleSidebar }) => {
   return (
     <header className="h-16 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-6 sticky top-0 z-40">
       
-      {/* Lado Izquierdo: Control y Título */}
       <div className="flex items-center gap-4">
         <button
           onClick={toggleSidebar}
@@ -37,10 +36,10 @@ const Navbar = ({ toggleSidebar }) => {
         </div>
       </div>
 
-      {/* Lado Derecho: Usuario y Acciones */}
+      {/* Usuario y Acciones */}
       <div className="flex items-center gap-3">
         
-        {/* Iconos de apoyo (opcional pero estético) */}
+        {/* Iconos de apoyo */}
         <div className="hidden sm:flex items-center gap-1 border-r border-gray-100 pr-3 mr-1">
           <button className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all">
             <RiNotification3Line className="text-xl" />

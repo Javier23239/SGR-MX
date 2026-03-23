@@ -10,7 +10,7 @@ const MainLayout = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
 
-      {/* NAVBAR ARRIBA COMPLETO */}
+      {/* NAVBAR COMPLETO */}
       <Navbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
 
       <div className="flex flex-1">

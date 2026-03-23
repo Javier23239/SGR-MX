@@ -3,8 +3,7 @@ import {
   RiNodejsLine, 
   RiDatabase2Line, 
   RiMapPinRangeLine,
-  RiShieldCheckLine,
-  RiFlashlightLine 
+  RiShieldCheckLine, 
 } from "react-icons/ri";
 
 const Tecnologias = () => {
@@ -50,7 +49,7 @@ const Tecnologias = () => {
           </p>
         </div>
 
-        {/* Grid de Tecnologías */}
+        {/* Tecnologias */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {techs.map((tech) => (
             <div
@@ -68,7 +67,6 @@ const Tecnologias = () => {
           ))}
         </div>
 
-        {/* Features adicionales cortos */}
         <div className="mt-16 flex flex-wrap justify-center gap-8 border-t border-gray-100 pt-10">
           <div className="flex items-center gap-2 text-gray-400">
             <RiShieldCheckLine className="text-xl text-green-500" />

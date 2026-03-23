@@ -4,7 +4,7 @@ const API_URL = 'http://localhost:5000';
 
 export const reportService = {
 
-  // --- MÉTODOS PARA EL RECOLECTOR (CONDUCTOR) ---
+  // --- METODOS ---
 
   getTasksByEmail: async (email) => {
     try {
@@ -40,9 +40,8 @@ export const reportService = {
   },
 
 
-  // --- MÉTODOS PARA EL ADMINISTRADOR ---
+  // METODOS PARA EL ADMINISTRADOR ---
 
-  // Este es el que usa tu Dashboard actual
   getAll: async () => {
     try {
       const res = await axios.get(`${API_URL}/admin/reportes`);
@@ -53,7 +52,6 @@ export const reportService = {
     }
   },
 
-  // Mantenemos este por si otros componentes lo usan
   getAllAdmin: async () => {
     try {
       const res = await axios.get(`${API_URL}/admin/reportes`);
@@ -64,7 +62,6 @@ export const reportService = {
     }
   },
 
-  // IMPORTANTE: No olvides este para poder asignar recolectores
   assignReport: async (id_solicitud, id_recolector) => {
     try {
       const res = await axios.put(`${API_URL}/admin/asignar-reporte`, {

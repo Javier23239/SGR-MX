@@ -19,16 +19,17 @@ import NuevoReporte from "../pages/ciudadano/NuevoReporte";
 import DashboardConductor from "../pages/conductor/DashboardConductor";
 import RutasConductor from "../pages/conductor/RutasConductor";
 import HistorialConductor from "../pages/conductor/HistorialConductor";
+import MapaRuta from "../pages/conductor/MapaRuta";
 
 const AppRouter = () => {
   return (
     <Routes>
-      {/* 1. RUTAS PÚBLICAS (Sin protección) */}
+      {/* RUTAS PUBLICAS */}
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/registro-ciudadano" element={<RegistroCiudadano />} /> {/* <-- Nueva Ruta para vecinos */}
+      <Route path="/registro-ciudadano" element={<RegistroCiudadano />} />
 
-      {/* 2. RUTAS DE ADMINISTRADOR (Protegidas) */}
+      {/* RUTAS DE ADMINISTRADOR */}
       <Route
         path="/admin"
         element={
@@ -42,7 +43,7 @@ const AppRouter = () => {
         <Route path="usuarios" element={<Usuarios />} />
       </Route>
 
-      {/* 3. RUTAS DE CIUDADANO (Protegidas) */}
+      {/* RUTAS DE CIUDADANO */}
       <Route
         path="/ciudadano"
         element={
@@ -56,11 +57,11 @@ const AppRouter = () => {
         <Route path="reportes/nuevo" element={<NuevoReporte />} />
       </Route>
 
-      {/* 4. RUTAS DE CONDUCTOR (Protegidas) */}
+      {/* RUTAS DE CONDUCTOR */}
       <Route
         path="/conductor"
         element={
-          <ProtectedRoute role="CONDUCTOR">
+          <ProtectedRoute role="RECOLECTOR">
             <MainLayout />
           </ProtectedRoute>
         }
@@ -68,9 +69,9 @@ const AppRouter = () => {
         <Route index element={<DashboardConductor />} />
         <Route path="rutas" element={<RutasConductor />} />
         <Route path="historial" element={<HistorialConductor />} />
+        <Route path="mapa" element={<MapaRuta/>} />
       </Route>
 
-      {/* 5. RUTA 404 */}
       <Route path="*" element={<div className="p-10 text-center"><h1>404 - Página no encontrada</h1></div>} />
     </Routes>
   );

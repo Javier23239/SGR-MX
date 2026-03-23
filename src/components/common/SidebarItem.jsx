@@ -5,7 +5,6 @@ import { RiArrowRightSLine, RiRecordCircleLine } from "react-icons/ri";
 const SidebarItem = ({ to, label, children, icon: Icon }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  // Si tiene hijos, renderizamos el componente tipo Acordeón
   if (children) {
     return (
       <div className="mb-1">
@@ -19,18 +18,15 @@ const SidebarItem = ({ to, label, children, icon: Icon }) => {
           `}
         >
           <div className="flex items-center gap-3">
-            {/* Renderiza el icono si existe */}
             {Icon && <Icon className={`text-xl ${isOpen ? 'text-emerald-600' : 'text-gray-400 group-hover:text-emerald-500'}`} />}
             <span>{label}</span>
           </div>
           
-          {/* Flecha con rotación */}
           <RiArrowRightSLine 
             className={`text-lg transition-transform duration-300 ${isOpen ? "rotate-90 text-emerald-600" : "text-gray-400"}`} 
           />
         </button>
 
-        {/* Contenedor de sub-menús con animación de entrada */}
         <div 
           className={`
             ml-6 mt-1 space-y-1 border-l-2 border-emerald-50 overflow-hidden transition-all duration-300
@@ -43,7 +39,6 @@ const SidebarItem = ({ to, label, children, icon: Icon }) => {
     );
   }
 
-  // Si es un link simple
   return (
     <NavLink
       to={to}
@@ -56,7 +51,6 @@ const SidebarItem = ({ to, label, children, icon: Icon }) => {
         }`
       }
     >
-      {/* Icono para links simples o punto sutil para sub-items */}
       {Icon ? (
         <Icon className="text-xl group-hover:scale-110 transition-transform" />
       ) : (
@@ -65,7 +59,6 @@ const SidebarItem = ({ to, label, children, icon: Icon }) => {
       
       <span>{label}</span>
 
-      {/* Indicador de activo (opcional) */}
       <NavLink
         to={to}
         className={({ isActive }) => 

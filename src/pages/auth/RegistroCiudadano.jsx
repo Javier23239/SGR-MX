@@ -7,7 +7,8 @@ import {
   RiMapPinLine, 
   RiPhoneLine,
   RiUser3Line,
-  RiArrowRightLine
+  RiArrowRightLine,
+  RiErrorWarningLine 
 } from "react-icons/ri";
 
 const RegistroCiudadano = () => {
@@ -21,14 +22,34 @@ const RegistroCiudadano = () => {
     telefono: "",
     rol: "VECINO" 
   });
+  
   const [isLoading, setIsLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (e.target.name === "password") setPasswordError("");
+  };
+
+  const validarPassword = (pass) => {
+    const regex = /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+    return regex.test(pass);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const tieneCamposVacios = Object.values(formData).some(val => val.trim() === "");
+    if (tieneCamposVacios) {
+      alert("Por favor, completa todos los campos.");
+      return;
+    }
+
+    if (!validarPassword(formData.password)) {
+      setPasswordError("La contraseña debe tener 8+ caracteres, una mayúscula y un carácter especial.");
+      return;
+    }
+
     setIsLoading(true);
     try {
       const response = await fetch("http://localhost:5000/registrar-ciudadano", {
@@ -38,13 +59,14 @@ const RegistroCiudadano = () => {
       });
 
       if (response.ok) {
-        alert("¡Cuenta creada con éxito! Ahora puedes iniciar sesión.");
+        alert("¡Cuenta creada con éxito! Bienvenido a SGR-MX.");
         navigate("/login"); 
       } else {
         const data = await response.json();
-        alert("Error: " + data.error);
+        alert("Error: " + (data.error || "No se pudo completar el registro"));
       }
     } catch (error) {
+      console.error("Error en registro:", error);
       alert("Error de conexión con el servidor");
     } finally {
       setIsLoading(false);
@@ -53,115 +75,125 @@ const RegistroCiudadano = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
-      <div className="max-w-2xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100 flex flex-col md:flex-row">
+      <div className="max-w-4xl w-full bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 flex flex-col md:flex-row">
         
-        {/* Lado Lateral: Informativo */}
-        <div className="md:w-1/3 bg-emerald-600 p-8 text-white flex flex-col justify-center items-center text-center space-y-4">
-          <div className="p-4 bg-white/20 rounded-full backdrop-blur-sm">
-            <RiUserAddLine className="text-5xl" />
+        <div className="md:w-1/3 bg-emerald-600 p-10 text-white flex flex-col justify-center items-center text-center space-y-6">
+          <div className="p-5 bg-white/20 rounded-3xl backdrop-blur-md shadow-inner">
+            <RiUserAddLine className="text-6xl" />
           </div>
-          <h2 className="text-2xl font-black tracking-tight leading-tight">Únete a SGR-MX</h2>
-          <p className="text-emerald-100 text-xs">
-            Al registrarte, podrás reportar acumulaciones de residuos y ayudar a mejorar tu comunidad.
-          </p>
+          <div>
+            <h2 className="text-3xl font-black tracking-tighter mb-2 italic">SGR-MX</h2>
+            <p className="text-emerald-100 text-sm font-medium leading-relaxed">
+              Sé parte del cambio. Reporta, ayuda y mantén tu comunidad limpia.
+            </p>
+          </div>
         </div>
 
-        {/* Lado Formulario */}
-        <div className="md:w-2/3 p-8 lg:p-12">
-          <div className="mb-8">
-            <h3 className="text-2xl font-black text-gray-800">Crear Cuenta</h3>
-            <p className="text-gray-500 text-sm">Completa tus datos para empezar.</p>
+        {/* Formulario */}
+        <div className="md:w-2/3 p-8 lg:p-14">
+          <div className="mb-10">
+            <h3 className="text-3xl font-black text-gray-800 tracking-tight">Crear Cuenta</h3>
+            <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mt-1">Todos los campos son obligatorios</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Nombre y Apellido en Grid */}
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="relative">
-                <RiUser3Line className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <RiUser3Line className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input 
                   name="nombre" 
                   placeholder="Nombre" 
                   onChange={handleChange} 
                   required 
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-sm" 
+                  className="w-full bg-gray-50 border border-gray-100 rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-sm font-medium" 
                 />
               </div>
               <div className="relative">
-                <RiUser3Line className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <RiUser3Line className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input 
                   name="apellido" 
                   placeholder="Apellido" 
                   onChange={handleChange} 
                   required 
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-sm" 
+                  className="w-full bg-gray-50 border border-gray-100 rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-sm font-medium" 
                 />
               </div>
             </div>
 
             {/* Email */}
             <div className="relative">
-              <RiMailLine className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <RiMailLine className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
               <input 
                 name="email" 
                 type="email" 
-                placeholder="Correo electrónico" 
+                placeholder="correo@ejemplo.com" 
                 onChange={handleChange} 
                 required 
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-sm" 
+                className="w-full bg-gray-50 border border-gray-100 rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-sm font-medium" 
               />
             </div>
 
-            {/* Password */}
-            <div className="relative">
-              <RiLockPasswordLine className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input 
-                name="password" 
-                type="password" 
-                placeholder="Crea una contraseña" 
-                onChange={handleChange} 
-                required 
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-sm" 
-              />
+            {/* Contra*/}
+            <div className="space-y-2">
+              <div className="relative">
+                <RiLockPasswordLine className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input 
+                  name="password" 
+                  type="password" 
+                  placeholder="Contraseña (Mín. 8 carac, Mayús y @)" 
+                  onChange={handleChange} 
+                  required 
+                  className={`w-full bg-gray-50 border ${passwordError ? 'border-red-400 ring-2 ring-red-50' : 'border-gray-100'} rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-sm font-medium`} 
+                />
+              </div>
+              {passwordError && (
+                <div className="flex items-center gap-2 text-red-500 text-[11px] font-black px-2 animate-bounce">
+                  <RiErrorWarningLine size={14} />
+                  <span>{passwordError}</span>
+                </div>
+              )}
             </div>
 
-            {/* Dirección */}
+            {/* Direccion */}
             <div className="relative">
-              <RiMapPinLine className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <RiMapPinLine className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
               <input 
                 name="direccion" 
                 placeholder="Dirección completa" 
                 onChange={handleChange} 
                 required 
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-sm" 
+                className="w-full bg-gray-50 border border-gray-100 rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-sm font-medium" 
               />
             </div>
 
-            {/* Teléfono */}
+            {/* Telefono */}
             <div className="relative">
-              <RiPhoneLine className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <RiPhoneLine className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
               <input 
                 name="telefono" 
+                type="tel"
                 placeholder="Teléfono (10 dígitos)" 
                 onChange={handleChange} 
                 required 
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-sm" 
+                className="w-full bg-gray-50 border border-gray-100 rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-sm font-medium" 
               />
             </div>
 
+            {/* Boton */}
             <button 
               type="submit" 
               disabled={isLoading}
-              className="w-full bg-emerald-600 text-white py-3.5 rounded-xl font-bold hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100 flex items-center justify-center gap-2 group"
+              className="w-full bg-emerald-600 text-white py-5 rounded-2xl font-black text-sm hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-100 flex items-center justify-center gap-3 group disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
             >
-              {isLoading ? "Registrando..." : "Registrarme ahora"}
-              {!isLoading && <RiArrowRightLine className="group-hover:translate-x-1 transition-transform" />}
+              {isLoading ? "PROCESANDO..." : "REGISTRARME AHORA"}
+              {!isLoading && <RiArrowRightLine className="group-hover:translate-x-2 transition-transform" size={20}/>}
             </button>
           </form>
 
-          <div className="mt-8 text-center">
-            <p className="text-sm text-gray-500">
-              ¿Ya tienes cuenta?{" "}
-              <Link to="/login" className="text-emerald-600 font-black hover:underline underline-offset-4">
+          <div className="mt-10 text-center">
+            <p className="text-sm text-gray-400 font-bold">
+              ¿Ya tienes una cuenta?{" "}
+              <Link to="/login" className="text-emerald-600 font-black hover:text-emerald-800 transition-colors uppercase decoration-2 underline-offset-4">
                 Inicia sesión
               </Link>
             </p>

@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { reportService } from "../../services/report.service";
 import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom"; 
 import { 
   RiMapPin2Line, 
   RiRouteLine, 
@@ -8,11 +9,13 @@ import {
   RiPlayCircleLine, 
   RiLoader4Line,
   RiInformationLine,
-  RiCompass3Line
+  RiCompass3Line,
+  RiMap2Line
 } from "react-icons/ri";
 
 const RutasConductor = () => {
   const { user } = useAuth();
+  const navigate = useNavigate(); 
   const [reportes, setReportes] = useState([]);
   const [cargando, setCargando] = useState(true);
 
@@ -23,7 +26,7 @@ const RutasConductor = () => {
       const tareas = await reportService.getTasksByEmail(user.email);
       setReportes(tareas);
     } catch (error) {
-      console.error("❌ Error al cargar rutas de la DB:", error);
+      console.error("Error al cargar rutas:", error);
     } finally {
       setCargando(false);
     }
@@ -33,16 +36,24 @@ const RutasConductor = () => {
     cargarRutas();
   }, [cargarRutas]);
 
-  const iniciar = async (id) => {
+  const iniciarRuta = async (reporte) => {
     try {
-      await reportService.updateStatus(id, "En ruta");
-      await cargarRutas();
+      await reportService.updateStatus(reporte.ID_SOLICITUD, "En ruta");
+      
+      navigate('/conductor/mapa', { 
+        state: { 
+          latDestino: reporte.LATITUD, 
+          lngDestino: reporte.LONGITUD,
+          descripcion: reporte.DESCRIPCION
+        } 
+      });
     } catch (error) {
-      alert("No se pudo iniciar la ruta");
+      alert("Error al iniciar el recorrido");
     }
   };
 
   const completar = async (id) => {
+    if (!window.confirm("¿Confirmas que has finalizado la recolección?")) return;
     try {
       await reportService.updateStatus(id, "Completada");
       await cargarRutas();
@@ -53,9 +64,9 @@ const RutasConductor = () => {
 
   if (cargando) {
     return (
-      <div className="flex flex-col items-center justify-center p-20 animate-pulse">
-        <RiLoader4Line className="text-5xl text-blue-500 animate-spin mb-4" />
-        <p className="text-gray-400 font-black text-[10px] uppercase tracking-[0.2em]">Sincronizando Rutas...</p>
+      <div className="flex flex-col items-center justify-center p-20">
+        <RiLoader4Line className="text-5xl text-indigo-500 animate-spin mb-4" />
+        <p className="text-gray-400 font-black text-[10px] uppercase tracking-widest">Sincronizando Hoja de Ruta...</p>
       </div>
     );
   }
@@ -63,94 +74,102 @@ const RutasConductor = () => {
   return (
     <div className="max-w-4xl mx-auto p-4 md:p-8 space-y-8 animate-fadeIn">
       
-      {/* Header Informativo */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center">
-            <RiRouteLine size={28} />
+      {/* Header  */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
+        <div className="flex items-center gap-5">
+          <div className="w-14 h-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-100">
+            <RiRouteLine size={32} />
           </div>
           <div>
-            <h1 className="text-2xl font-black text-gray-800 tracking-tight">Mis Rutas Asignadas</h1>
-            <p className="text-xs text-gray-400 font-medium">Oracle Database Sync: Activo</p>
+            <h1 className="text-3xl font-black text-gray-800 tracking-tight">Mi Jornada</h1>
+            <p className="text-sm text-gray-400 font-bold uppercase tracking-tighter">Unidad: {user?.email.split('@')[0]}</p>
           </div>
         </div>
-        <div className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-xl shadow-lg shadow-indigo-100">
-            <RiCompass3Line className="animate-spin-slow" />
-            <span className="text-xs font-bold uppercase tracking-wider">{reportes.length} Pendientes</span>
+        <div className="bg-gray-900 text-white px-6 py-3 rounded-2xl flex items-center gap-3">
+            <RiCompass3Line className="text-indigo-400 animate-spin-slow" size={20} />
+            <span className="text-xs font-black uppercase">{reportes.length} Pendientes</span>
         </div>
       </div>
 
-      {/* Listado de Rutas */}
+      {/* Listado  */}
       {reportes.length === 0 ? (
-        <div className="bg-white p-16 rounded-[2rem] border-2 border-dashed border-gray-100 text-center flex flex-col items-center">
-          <RiInformationLine size={48} className="text-gray-200 mb-4" />
-          <h2 className="text-gray-400 font-bold text-lg">No hay tareas para hoy</h2>
-          <p className="text-gray-300 text-sm">Relájate, tu hoja de ruta está limpia.</p>
+        <div className="bg-white p-20 rounded-[3rem] border-2 border-dashed border-gray-100 text-center">
+          <RiInformationLine size={60} className="text-gray-100 mx-auto mb-4" />
+          <h2 className="text-gray-400 font-bold text-xl">Ruta Despejada</h2>
+          <p className="text-gray-300 text-sm mt-1">No tienes recolecciones asignadas por ahora.</p>
         </div>
       ) : (
         <div className="grid gap-6">
           {reportes.map((r) => (
             <div
-              key={r.id}
-              className="group bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-indigo-100 transition-all overflow-hidden"
+              key={r.ID_SOLICITUD}
+              className="group bg-white rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden"
             >
-              <div className="p-6 md:p-8 flex flex-col md:flex-row justify-between gap-6">
+              <div className="p-8 flex flex-col md:flex-row justify-between gap-8">
                 
-                {/* Info de la Ruta */}
-                <div className="space-y-4 flex-1">
+                <div className="space-y-5 flex-1">
                   <div className="flex items-center gap-3">
-                    <span className="text-[10px] font-black bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg uppercase">
-                      ID: #{r.id}
+                    <span className="text-[10px] font-black bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg">
+                      #{r.ID_SOLICITUD}
                     </span>
-                    <span className={`text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-wider border ${
-                        r.estado === 'En ruta' 
-                        ? 'bg-purple-50 text-purple-700 border-purple-100' 
-                        : 'bg-blue-50 text-blue-700 border-blue-100'
+                    <span className={`text-[10px] font-black px-3 py-1 rounded-lg uppercase border ${
+                        r.ESTADO === 'En ruta' 
+                        ? 'bg-amber-500 text-white border-amber-500' 
+                        : 'bg-white text-gray-400 border-gray-200'
                     }`}>
-                        {r.estado}
+                        {r.ESTADO}
                     </span>
                   </div>
 
                   <div>
-                    <h3 className="text-xl font-black text-gray-800 group-hover:text-indigo-600 transition-colors">
-                      {r.tipo}
-                    </h3>
-                    <div className="mt-2 space-y-2">
-                        <div className="flex items-center gap-2 text-gray-500 font-medium italic text-sm">
-                            <RiMapPin2Line className="text-indigo-500" />
-                            {r.ubicacion}
+                    <div className="flex items-start gap-3 bg-gray-50 p-5 rounded-[1.5rem] border border-gray-100 group-hover:bg-white group-hover:border-indigo-100 transition-all">
+                        <RiMapPin2Line className="text-indigo-500 mt-1 flex-shrink-0" size={22} />
+                        <div>
+                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Dirección de Recolección</span>
+                            <p className="text-gray-800 font-black text-lg leading-tight mt-1">{r.DIRECCION || "Ubicación por GPS"}</p>
                         </div>
-                        {r.descripcion && (
-                            <p className="text-xs text-gray-400 leading-relaxed bg-gray-50 p-3 rounded-xl border border-gray-100/50">
-                                {r.descripcion}
-                            </p>
-                        )}
                     </div>
+                    
+                    {r.DESCRIPCION && (
+                        <p className="mt-4 text-sm text-gray-400 font-medium pl-2 border-l-2 border-indigo-100">
+                           {r.DESCRIPCION.split('|')[0].replace(/[[\]]/g, '')}
+                        </p>
+                    )}
                   </div>
                 </div>
 
-                {/* Botón de Acción - Cambia dinámicamente */}
-                <div className="flex items-center justify-center md:justify-end">
-                  {r.estado === "Asignado" ? (
+                <div className="flex flex-col justify-center gap-3">
+                  {r.ESTADO === "Asignado" ? (
                     <button
-                      onClick={() => iniciar(r.id)}
-                      className="w-full md:w-auto flex items-center justify-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black px-8 py-5 rounded-2xl transition-all shadow-lg shadow-indigo-100 active:scale-95"
+                      onClick={() => iniciarRuta(r)}
+                      className="flex items-center justify-center gap-3 bg-indigo-600 hover:bg-gray-900 text-white font-black px-10 py-5 rounded-[1.5rem] transition-all shadow-xl shadow-indigo-100 active:scale-95"
                     >
-                      <RiPlayCircleLine size={24} /> Iniciar Recorrido
+                      <RiPlayCircleLine size={24} /> Iniciar Ruta
                     </button>
                   ) : (
-                    <button
-                      onClick={() => completar(r.id)}
-                      className="w-full md:w-auto flex items-center justify-center gap-3 bg-emerald-500 hover:bg-emerald-600 text-white font-black px-8 py-5 rounded-2xl transition-all shadow-lg shadow-emerald-100 active:scale-95"
-                    >
-                      <RiCheckboxCircleFill size={24} /> Finalizar Tarea
-                    </button>
+                    <>
+                      <button
+                        onClick={() => navigate('/conductor/mapa', { state: { latDestino: r.LATITUD, lngDestino: r.LONGITUD, descripcion: r.DESCRIPCION }})}
+                        className="flex items-center justify-center gap-3 bg-white border-2 border-indigo-600 text-indigo-600 font-black px-10 py-4 rounded-[1.5rem] hover:bg-indigo-50 transition-all"
+                      >
+                        <RiMap2Line size={24} /> Ver Mapa
+                      </button>
+                      <button
+                        onClick={() => completar(r.ID_SOLICITUD)}
+                        className="flex items-center justify-center gap-3 bg-emerald-500 hover:bg-emerald-600 text-white font-black px-10 py-5 rounded-[1.5rem] transition-all shadow-xl shadow-emerald-100 active:scale-95"
+                      >
+                        <RiCheckboxCircleFill size={24} /> Finalizar
+                      </button>
+                    </>
                   )}
                 </div>
               </div>
-
-              {/* Barra decorativa inferior según el estado */}
-              <div className={`h-1.5 w-full ${r.estado === 'En ruta' ? 'bg-purple-400' : 'bg-blue-400'}`} />
+              
+              <div className="h-1.5 w-full bg-gray-50">
+                <div 
+                  className={`h-full transition-all duration-700 ${r.ESTADO === 'En ruta' ? 'w-full bg-amber-500' : 'w-1/4 bg-indigo-600'}`} 
+                />
+              </div>
             </div>
           ))}
         </div>

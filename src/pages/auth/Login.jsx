@@ -5,8 +5,7 @@ import {
   RiMailLine, 
   RiLockPasswordLine, 
   RiShieldCheckLine, 
-  RiArrowRightLine,
-  RiDatabaseLine 
+  RiArrowRightLine, 
 } from "react-icons/ri";
 
 const Login = () => {
@@ -25,9 +24,14 @@ const Login = () => {
 
     try {
       const rol = await login(email.trim(), password);
-      if (rol === "ADMIN") navigate("/admin");
-      else if (rol === "CIUDADANO") navigate("/ciudadano");
-      else if (rol === "CONDUCTOR") navigate("/conductor");
+      
+      if (rol === "ADMIN") {
+        navigate("/admin");
+      } else if (rol === "CIUDADANO") {
+        navigate("/ciudadano");
+      } else if (rol === "RECOLECTOR") { 
+        navigate("/conductor");
+      }
     } catch (err) {
       setError(err.message || "Credenciales incorrectas.");
     } finally {
@@ -39,9 +43,7 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4 font-sans">
       <div className="max-w-4xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row border border-gray-100">
         
-        {/* Lado Izquierdo: Visual/Informativo */}
         <div className="md:w-1/2 bg-emerald-600 p-12 text-white flex flex-col justify-between relative overflow-hidden">
-          {/* Decoración de fondo */}
           <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-emerald-500 rounded-full opacity-50"></div>
           <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-32 h-32 bg-emerald-700 rounded-full opacity-50"></div>
 
@@ -57,7 +59,7 @@ const Login = () => {
           </div>
         </div>
 
-        {/* Lado Derecho: Formulario */}
+        {/* Formulario */}
         <div className="md:w-1/2 p-8 md:p-12">
           <div className="mb-10">
             <h3 className="text-2xl font-black text-gray-800">Iniciar Sesión</h3>
@@ -78,7 +80,7 @@ const Login = () => {
                 <RiMailLine className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl" />
                 <input
                   type="text"
-                  placeholder="admin@sgr.com"
+                  placeholder="ejemplo@correo.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-11 pr-4 py-3 focus:ring-2 focus:ring-emerald-500 focus:bg-white outline-none transition-all text-gray-700"
