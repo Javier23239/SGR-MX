@@ -1,38 +1,77 @@
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
+import { RiArrowRightSLine, RiRecordCircleLine } from "react-icons/ri";
 
-const SidebarItem = ({ to, label, children }) => {
-  const [open, setOpen] = useState(false);
+const SidebarItem = ({ to, label, children, icon: Icon }) => {
+  const [isOpen, setIsOpen] = useState(false);
 
+  // Si tiene hijos, renderizamos el componente tipo Acordeón
   if (children) {
     return (
-      <div>
+      <div className="mb-1">
         <button
-          onClick={() => setOpen(!open)}
-          className="w-full text-left px-4 py-2 rounded text-sm hover:bg-green-600"
+          onClick={() => setIsOpen(!isOpen)}
+          className={`
+            w-full flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-bold transition-all duration-200 group
+            ${isOpen 
+              ? "bg-gray-50 text-emerald-700" 
+              : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"}
+          `}
         >
-          {label}
+          <div className="flex items-center gap-3">
+            {/* Renderiza el icono si existe */}
+            {Icon && <Icon className={`text-xl ${isOpen ? 'text-emerald-600' : 'text-gray-400 group-hover:text-emerald-500'}`} />}
+            <span>{label}</span>
+          </div>
+          
+          {/* Flecha con rotación */}
+          <RiArrowRightSLine 
+            className={`text-lg transition-transform duration-300 ${isOpen ? "rotate-90 text-emerald-600" : "text-gray-400"}`} 
+          />
         </button>
 
-        {open && (
-          <div className="ml-4 mt-1 space-y-1">
-            {children}
-          </div>
-        )}
+        {/* Contenedor de sub-menús con animación de entrada */}
+        <div 
+          className={`
+            ml-6 mt-1 space-y-1 border-l-2 border-emerald-50 overflow-hidden transition-all duration-300
+            ${isOpen ? "max-h-96 opacity-100 py-1" : "max-h-0 opacity-0"}
+          `}
+        >
+          {children}
+        </div>
       </div>
     );
   }
 
+  // Si es un link simple
   return (
     <NavLink
       to={to}
       className={({ isActive }) =>
-        `block px-4 py-2 rounded text-sm ${
-          isActive ? "bg-green-800" : "hover:bg-green-600"
+        `flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all duration-300 group mb-1
+        ${
+          isActive
+            ? "bg-emerald-50 text-emerald-700 shadow-sm shadow-emerald-100/50"
+            : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
         }`
       }
     >
-      {label}
+      {/* Icono para links simples o punto sutil para sub-items */}
+      {Icon ? (
+        <Icon className="text-xl group-hover:scale-110 transition-transform" />
+      ) : (
+        <RiRecordCircleLine className="text-[10px] ml-1 opacity-40 group-hover:opacity-100" />
+      )}
+      
+      <span>{label}</span>
+
+      {/* Indicador de activo (opcional) */}
+      <NavLink
+        to={to}
+        className={({ isActive }) => 
+          `ml-auto w-1.5 h-1.5 rounded-full bg-emerald-500 transition-opacity ${isActive ? 'opacity-100' : 'opacity-0'}`
+        }
+      />
     </NavLink>
   );
 };

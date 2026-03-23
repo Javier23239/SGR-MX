@@ -62,6 +62,10 @@ const NavbarPublic = () => {
             Nosotros
           </button>
 
+          <button onClick={() => scrollTo("tecnologias")} className="hover:text-green-600 transition">
+            Tecnologia
+          </button>
+
           <button onClick={() => scrollTo("servicio")} className="hover:text-green-600 transition">
             Servicio
           </button>

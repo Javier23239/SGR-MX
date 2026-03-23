@@ -1,20 +1,21 @@
 import { Routes, Route } from "react-router-dom";
 import Login from "../pages/auth/Login";
+import RegistroCiudadano from "../pages/auth/RegistroCiudadano"; 
 import ProtectedRoute from "../components/common/ProtectedRoute";
 import MainLayout from "../layout/MainLayout";
 import Home from "../pages/public/Home";
 
-// Admin
+// --- SECCION ADMIN ---
 import DashboardAdmin from "../pages/admin/DashboardAdmin";
 import GestionReportes from "../pages/admin/GestionReportes";
-import Usuarios from "../pages/admin/Usuarios";
+import Usuarios from "../pages/admin/Usuarios"; 
 
-// Ciudadano
+// --- SECCION CIUDADANO ---
 import DashboardCiudadano from "../pages/ciudadano/DashboardCiudadano";
 import ReportesCiudadano from "../pages/ciudadano/ReportesCiudadano";
 import NuevoReporte from "../pages/ciudadano/NuevoReporte";
 
-// Conductor
+// --- SECCION CONDUCTOR ---
 import DashboardConductor from "../pages/conductor/DashboardConductor";
 import RutasConductor from "../pages/conductor/RutasConductor";
 import HistorialConductor from "../pages/conductor/HistorialConductor";
@@ -22,12 +23,12 @@ import HistorialConductor from "../pages/conductor/HistorialConductor";
 const AppRouter = () => {
   return (
     <Routes>
-
-      {/* PUBLIC */}
+      {/* 1. RUTAS PÚBLICAS (Sin protección) */}
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/registro-ciudadano" element={<RegistroCiudadano />} /> {/* <-- Nueva Ruta para vecinos */}
 
-      {/* ADMIN */}
+      {/* 2. RUTAS DE ADMINISTRADOR (Protegidas) */}
       <Route
         path="/admin"
         element={
@@ -38,10 +39,10 @@ const AppRouter = () => {
       >
         <Route index element={<DashboardAdmin />} />
         <Route path="reportes" element={<GestionReportes />} />
-        <Route path="usuarios" element={<Usuarios/>} />
+        <Route path="usuarios" element={<Usuarios />} />
       </Route>
 
-      {/* CIUDADANO */}
+      {/* 3. RUTAS DE CIUDADANO (Protegidas) */}
       <Route
         path="/ciudadano"
         element={
@@ -55,7 +56,7 @@ const AppRouter = () => {
         <Route path="reportes/nuevo" element={<NuevoReporte />} />
       </Route>
 
-      {/* CONDUCTOR */}
+      {/* 4. RUTAS DE CONDUCTOR (Protegidas) */}
       <Route
         path="/conductor"
         element={
@@ -67,10 +68,10 @@ const AppRouter = () => {
         <Route index element={<DashboardConductor />} />
         <Route path="rutas" element={<RutasConductor />} />
         <Route path="historial" element={<HistorialConductor />} />
-
-
       </Route>
 
+      {/* 5. RUTA 404 */}
+      <Route path="*" element={<div className="p-10 text-center"><h1>404 - Página no encontrada</h1></div>} />
     </Routes>
   );
 };

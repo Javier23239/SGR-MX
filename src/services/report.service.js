@@ -1,47 +1,80 @@
-const STORAGE_KEY = "reportes";
+import axios from 'axios';
 
-const getAll = () =>
-  JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-
-const save = (data) =>
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+const API_URL = 'http://localhost:5000';
 
 export const reportService = {
-  getAll,
 
-  assignReport(id, conductor) {
-    const reportes = getAll();
+  // --- MÉTODOS PARA EL RECOLECTOR (CONDUCTOR) ---
 
-    const updated = reportes.map((r) =>
-      r.id === id
-        ? { ...r, estado: "Asignado", conductor }
-        : r
-    );
-
-    save(updated);
+  getTasksByEmail: async (email) => {
+    try {
+      const res = await axios.get(`${API_URL}/recolector/mis-tareas/${email}`);
+      return res.data; 
+    } catch (error) {
+      console.error("Error al obtener tareas:", error);
+      throw error;
+    }
   },
 
-  startRoute(id) {
-    const reportes = getAll();
-
-    const updated = reportes.map((r) =>
-      r.id === id
-        ? { ...r, estado: "En ruta" }
-        : r
-    );
-
-    save(updated);
+  getHistoryByEmail: async (email) => {
+    try {
+      const res = await axios.get(`${API_URL}/recolector/historial/${email}`);
+      return res.data;
+    } catch (error) {
+      console.error("Error al obtener historial:", error);
+      throw error;
+    }
   },
 
-  completeReport(id) {
-    const reportes = getAll();
-
-    const updated = reportes.map((r) =>
-      r.id === id
-        ? { ...r, estado: "Recolectado" }
-        : r
-    );
-
-    save(updated);
+  updateStatus: async (id_solicitud, nuevo_estado) => {
+    try {
+      const res = await axios.put(`${API_URL}/recolector/actualizar-estado`, {
+        id_solicitud,
+        nuevo_estado
+      });
+      return res.data;
+    } catch (error) {
+      console.error("Error al actualizar estado:", error);
+      throw error;
+    }
   },
+
+
+  // --- MÉTODOS PARA EL ADMINISTRADOR ---
+
+  // Este es el que usa tu Dashboard actual
+  getAll: async () => {
+    try {
+      const res = await axios.get(`${API_URL}/admin/reportes`);
+      return res.data;
+    } catch (error) {
+      console.error("Error en getAll:", error);
+      return [];
+    }
+  },
+
+  // Mantenemos este por si otros componentes lo usan
+  getAllAdmin: async () => {
+    try {
+      const res = await axios.get(`${API_URL}/admin/reportes`);
+      return res.data;
+    } catch (error) {
+      console.error("Error al obtener reportes generales:", error);
+      return [];
+    }
+  },
+
+  // IMPORTANTE: No olvides este para poder asignar recolectores
+  assignReport: async (id_solicitud, id_recolector) => {
+    try {
+      const res = await axios.put(`${API_URL}/admin/asignar-reporte`, {
+        id_solicitud,
+        id_recolector
+      });
+      return res.data;
+    } catch (error) {
+      console.error("Error al asignar reporte:", error);
+      throw error;
+    }
+  }
 };
