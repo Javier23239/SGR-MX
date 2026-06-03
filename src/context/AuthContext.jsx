@@ -1,27 +1,35 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState
+} from "react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+
   const [user, setUser] = useState(null);
+
   const [loading, setLoading] = useState(true);
 
+
   useEffect(() => {
-    const storedUser = localStorage.getItem("user_oracle");
+
+    const storedUser =
+      localStorage.getItem("user_oracle");
+
     if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (error) {
-        console.error("Error al parsear el usuario del storage", error);
-        localStorage.removeItem("user_oracle");
-      }
+      setUser(JSON.parse(storedUser));
     }
+
     setLoading(false);
+
   }, []);
 
-  // LOGIN
   const login = async (email, password) => {
     try {
+      //Peticion al Backend 
       const response = await fetch("http://localhost:5000/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -31,51 +39,69 @@ export const AuthProvider = ({ children }) => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Error al iniciar sesión");
+
+        throw new Error(
+          data.error || "Código incorrecto"
+        );
+
       }
 
-      const userData = { 
-        email, 
-        rol: data.rol, 
-        nombre: data.nombre, 
-        token: data.token 
-      };
+      const userData = { email, rol: data.rol };
 
       localStorage.setItem("user_oracle", JSON.stringify(userData));
+      
       setUser(userData);
 
-      return userData; 
-      
+      return data.rol; 
     } catch (error) {
-      console.error("Error en AuthContext:", error.message);
-      throw error; 
+
+      console.error(
+        "Error verificando OTP:",
+        error.message
+      );
+
+      throw error;
+
     }
+
   };
 
-  //  LOGOUT: 
   const logout = () => {
-    localStorage.removeItem("user_oracle");
+
+    localStorage.removeItem(
+      "user_oracle"
+    );
+
+    localStorage.removeItem(
+      "otp_email"
+    );
+
     setUser(null);
+
   };
 
   return (
+
     <AuthContext.Provider
       value={{
+
         user,
+
+        loading,
+
         login,
-        logout,
-        loading
+
+        verifyOTP,
+
+        logout
+
       }}
     >
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
+
   );
+
 };
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth debe usarse dentro de un AuthProvider");
-  }
-  return context;
-};
+export const useAuth = () => useContext(AuthContext);
