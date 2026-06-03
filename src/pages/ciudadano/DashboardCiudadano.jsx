@@ -11,6 +11,7 @@ import {
   RiArrowRightSLine,
   RiDatabaseLine
 } from "react-icons/ri";
+import ChatBot from "../../components/chatbot/ChatBot";
 
 const DashboardCiudadano = () => {
   const [reportes, setReportes] = useState([]);
@@ -151,6 +152,7 @@ const DashboardCiudadano = () => {
         </div>
 
       </div>
+      <ChatBot />
     </div>
   );
 };

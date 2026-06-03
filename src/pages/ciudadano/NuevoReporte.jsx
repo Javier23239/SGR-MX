@@ -10,6 +10,7 @@ import {
   RiRadarLine,
   RiCheckboxCircleLine
 } from "react-icons/ri";
+import ChatBot from "../../components/chatbot/ChatBot";
 
 const NuevoReporte = () => {
   const navigate = useNavigate();
@@ -220,6 +221,7 @@ const NuevoReporte = () => {
           </div>
         </form>
       </div>
+      <ChatBot/>
     </div>
   );
 };
