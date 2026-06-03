@@ -6,18 +6,22 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-
   useEffect(() => {
     const storedUser = localStorage.getItem("user_oracle");
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        console.error("Error al parsear el usuario del storage", error);
+        localStorage.removeItem("user_oracle");
+      }
     }
     setLoading(false);
   }, []);
 
+  // LOGIN
   const login = async (email, password) => {
     try {
-      //Peticion al Backend 
       const response = await fetch("http://localhost:5000/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -30,19 +34,25 @@ export const AuthProvider = ({ children }) => {
         throw new Error(data.error || "Error al iniciar sesión");
       }
 
-      const userData = { email, rol: data.rol };
+      const userData = { 
+        email, 
+        rol: data.rol, 
+        nombre: data.nombre, 
+        token: data.token 
+      };
 
       localStorage.setItem("user_oracle", JSON.stringify(userData));
-      
       setUser(userData);
 
-      return data.rol; 
+      return userData; 
+      
     } catch (error) {
       console.error("Error en AuthContext:", error.message);
       throw error; 
     }
   };
 
+  //  LOGOUT: 
   const logout = () => {
     localStorage.removeItem("user_oracle");
     setUser(null);
@@ -57,9 +67,15 @@ export const AuthProvider = ({ children }) => {
         loading
       }}
     >
-      {children}
+      {!loading && children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth debe usarse dentro de un AuthProvider");
+  }
+  return context;
+};

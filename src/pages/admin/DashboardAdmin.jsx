@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { reportService } from "../../services/report.service";
+import { useAuth } from "../../context/AuthContext"; 
 import axios from "axios";
 import { 
   RiUserSettingsLine, 
@@ -13,20 +14,31 @@ import {
 } from "react-icons/ri";
 
 const DashboardAdmin = () => {
+  const { user } = useAuth(); 
   const [stats, setStats] = useState([]);
   const [recientes, setRecientes] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const cargarDatos = async () => {
+      if (!user?.token) return;
+
       try {
         setLoading(true);
-        const reportes = await reportService.getAll();
-        const resUsuarios = await axios.get("http://localhost:5000/usuarios");
+        
+        const config = {
+          headers: {
+            Authorization: `Bearer ${user.token}`
+          }
+        };
+
+        const reportes = await reportService.getAll(user.token);
+
+        const resUsuarios = await axios.get("http://localhost:5000/usuarios", config);
         const usuarios = resUsuarios.data || [];
 
         const activos = reportes.filter(
-          r => ["Asignado", "En ruta"].includes(r.ESTADO || r.estado)
+          r => ["Asignado", "En ruta", "Pendiente"].includes(r.ESTADO || r.estado)
         );
         const recolectados = reportes.filter(
           r => ["Completada", "Recolectado"].includes(r.ESTADO || r.estado)
@@ -53,7 +65,7 @@ const DashboardAdmin = () => {
     };
 
     cargarDatos();
-  }, []);
+  }, [user]);
 
   if (loading) {
     return (
@@ -73,11 +85,11 @@ const DashboardAdmin = () => {
           <h2 className="text-3xl font-black text-gray-800 flex items-center gap-3">
             <RiUserSettingsLine className="text-emerald-600" /> Panel de Administración
           </h2>
-          <p className="text-gray-500 text-sm mt-1">Monitoreo global del Sistema de Gestión de Residuos.</p>
+          <p className="text-gray-500 text-sm mt-1">Bienvenido, {user?.nombre}. Monitoreo global del sistema.</p>
         </div>
       </div>
 
-      {/* Etadisticas */}
+      {/* Estadísticas */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, index) => (
           <div key={index} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:scale-[1.02] transition-transform duration-300">
@@ -111,7 +123,7 @@ const DashboardAdmin = () => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-bold text-gray-800 truncate text-sm md:text-base">
-                      {(r.DESCRIPCION || r.descripcion || "Sin descripción").split('|')[0]}
+                      {r.DESCRIPCION || r.descripcion || "Sin descripción"}
                     </span>
                     <span className="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-lg font-black uppercase">
                        {r.CIUDADANO || r.ciudadano || "Anónimo"}
@@ -128,7 +140,7 @@ const DashboardAdmin = () => {
                 </div>
                 
                 <div className="flex items-center">
-                   <AdminEstadoBadge estado={r.ESTADO || r.estado} />
+                    <AdminEstadoBadge estado={r.ESTADO || r.estado} />
                 </div>
               </div>
             ))

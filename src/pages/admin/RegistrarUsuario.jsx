@@ -160,7 +160,6 @@ const RegistrarUsuario = ({ onUsuarioRegistrado }) => {
               onChange={handleChange}
               className="border-2 border-gray-100 p-2 rounded-lg w-full bg-white focus:border-blue-500 outline-none h-[44px] cursor-pointer font-medium"
             >
-              <option value="VECINO">Vecino</option>
               <option value="RECOLECTOR">Recolector</option>
               <option value="ADMIN">Admin</option>
             </select>

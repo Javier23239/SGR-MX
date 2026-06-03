@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext"; 
+import { reportService } from "../../services/report.service"; 
 import { 
   RiAddLine, 
   RiHistoryLine, 
@@ -21,9 +22,10 @@ const DashboardCiudadano = () => {
     const obtenerReportes = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:5000/solicitudes/${user?.email}`);
-        const data = await response.json();
-        setReportes(Array.isArray(data) ? data : []);
+        if (user?.email && user?.token) {
+          const data = await reportService.getByEmail(user.email, user.token);
+          setReportes(Array.isArray(data) ? data : []);
+        }
       } catch (error) {
         console.error("Error al obtener reportes:", error);
       } finally {
@@ -31,16 +33,13 @@ const DashboardCiudadano = () => {
       }
     };
 
-    if (user?.email) {
-      obtenerReportes();
-    }
+    obtenerReportes();
   }, [user]);
 
-  
   const total = reportes.length;
   const pendientes = reportes.filter(r => (r.ESTADO || r.estado) === "Pendiente").length;
   const enProceso = reportes.filter(r => ["Asignado", "En ruta"].includes(r.ESTADO || r.estado)).length;
-  const completados = reportes.filter(r => ["Recolectado", "Completada"].includes(r.ESTADO || r.estado)).length;
+  const completados = reportes.filter(r => ["Recolectado", "Completada", "Completado"].includes(r.ESTADO || r.estado)).length;
 
   if (loading) {
     return (
@@ -71,7 +70,6 @@ const DashboardCiudadano = () => {
         </Link>
       </div>
 
-      {/* Estadisticas */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <MetricCard title="Total Solicitudes" value={total} icon={<RiHistoryLine/>} color="text-gray-600" bg="bg-gray-50" />
         <MetricCard title="Pendientes" value={pendientes} icon={<RiTimeLine/>} color="text-amber-600" bg="bg-amber-50" />
@@ -82,51 +80,52 @@ const DashboardCiudadano = () => {
       {/* Actividad */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-       {/* Lista de Actividad  */}
-<div className="lg:col-span-2 bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100">
-  <div className="flex justify-between items-center mb-6">
-    <h2 className="font-black text-gray-800 text-xl flex items-center gap-2">
-      Actividad Reciente
-    </h2>
-    <Link to="/ciudadano/reportes" className="text-emerald-600 text-xs font-bold hover:underline flex items-center gap-1 uppercase tracking-wider">
-      Ver todo <RiArrowRightSLine />
-    </Link>
-  </div>
+        {/* Lista de Actividad */}
+        <div className="lg:col-span-2 bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="font-black text-gray-800 text-xl flex items-center gap-2">
+              Actividad Reciente
+            </h2>
+            <Link to="/ciudadano/reportes" className="text-emerald-600 text-xs font-bold hover:underline flex items-center gap-1 uppercase tracking-wider">
+              Ver todo <RiArrowRightSLine />
+            </Link>
+          </div>
 
-  {reportes.length === 0 ? (
-    <div className="text-center py-12 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-100">
-      <p className="text-gray-400 font-medium italic">No se han encontrado registros en Oracle.</p>
-    </div>
-  ) : (
-    <div className="space-y-4">
-      {reportes.slice(0, 4).map((r) => (
-        <div 
-          key={r.ID_SOLICITUD || r.id} 
-          className="group flex flex-col sm:flex-row sm:items-center justify-between p-4 hover:bg-emerald-50/50 rounded-2xl transition-all border border-transparent hover:border-emerald-100 gap-4"
-        >
-          <div className="flex-1 min-w-0"> 
-            <p className="font-bold text-gray-800 group-hover:text-emerald-700 transition-colors truncate text-sm md:text-base">
-              {(r.DESCRIPCION || r.descripcion || "Sin descripción").split('|')[0].replace('[','').replace(']','')}
-            </p>
-            <div className="flex flex-wrap items-center gap-2 md:gap-3 mt-1">
-              <span className="text-[10px] font-mono font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded">
-                #{r.ID_SOLICITUD || r.id}
-              </span>
-              <span className="text-[10px] text-gray-400 flex items-center gap-1 font-medium whitespace-nowrap">
-                <RiTimeLine /> {new Date(r.FECHA_SOLICITUD || r.fecha_solicitud).toLocaleDateString()}
-              </span>
+          {reportes.length === 0 ? (
+            <div className="text-center py-12 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-100">
+              <p className="text-gray-400 font-medium italic">No se han encontrado registros en Oracle.</p>
             </div>
-          </div>
-          
-          <div className="flex justify-start sm:justify-end">
-            <EstadoBadge estado={r.ESTADO || r.estado} />
-          </div>
+          ) : (
+            <div className="space-y-4">
+              {reportes.slice(0, 4).map((r) => (
+                <div 
+                  key={r.ID_SOLICITUD || r.id} 
+                  className="group flex flex-col sm:flex-row sm:items-center justify-between p-4 hover:bg-emerald-50/50 rounded-2xl transition-all border border-transparent hover:border-emerald-100 gap-4"
+                >
+                  <div className="flex-1 min-w-0"> 
+                    <p className="font-bold text-gray-800 group-hover:text-emerald-700 transition-colors truncate text-sm md:text-base">
+                      {(r.DESCRIPCION || r.descripcion || "Sin descripción").split('|')[0]}
+                    </p>
+                    <div className="flex flex-wrap items-center gap-2 md:gap-3 mt-1">
+                      <span className="text-[10px] font-mono font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded">
+                        ID: #{r.ID_SOLICITUD || r.id}
+                      </span>
+                      <span className="text-[10px] text-gray-400 flex items-center gap-1 font-medium whitespace-nowrap">
+                        <RiTimeLine /> {new Date(r.FECHA_SOLICITUD || r.fecha_solicitud).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-start sm:justify-end">
+                    <EstadoBadge estado={r.ESTADO || r.estado} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      ))}
-    </div>
-  )}
-</div>
 
+        {/* Status  */}
         <div className="bg-emerald-900 p-8 rounded-3xl shadow-xl text-white relative overflow-hidden">
           <div className="relative z-10">
             <div className="bg-emerald-800 w-12 h-12 rounded-2xl flex items-center justify-center mb-6 shadow-inner">
@@ -134,16 +133,16 @@ const DashboardCiudadano = () => {
             </div>
             <h3 className="font-black text-xl mb-2 tracking-tight">Estado del Sistema</h3>
             <p className="text-emerald-200 text-sm leading-relaxed mb-6">
-              Tu conexión con la base de datos Oracle está activa. Los reportes se sincronizan en tiempo real con el panel de administración.
+              Tu conexión con la base de datos Oracle está activa. Los reportes se sincronizan en tiempo real.
             </p>
             <div className="space-y-3">
               <div className="flex justify-between text-xs font-bold border-b border-emerald-800 pb-2 text-emerald-300">
                 <span>DATABASE</span>
-                <span className="text-white">ORACLE 21C</span>
+                <span className="text-white">ORACLE XEPDB1</span>
               </div>
               <div className="flex justify-between text-xs font-bold border-b border-emerald-800 pb-2 text-emerald-300">
-                <span>ESTADO</span>
-                <span className="text-emerald-400 flex items-center gap-1">● ONLINE</span>
+                <span>SESIÓN</span>
+                <span className="text-emerald-400 flex items-center gap-1">● ACTIVA</span>
               </div>
             </div>
           </div>
@@ -154,7 +153,6 @@ const DashboardCiudadano = () => {
     </div>
   );
 };
-
 
 const MetricCard = ({ title, value, icon, color, bg }) => (
   <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:scale-[1.02] transition-transform duration-300">
@@ -173,11 +171,12 @@ const EstadoBadge = ({ estado }) => {
     "En ruta": "bg-purple-50 text-purple-600 border-purple-100",
     Recolectado: "bg-emerald-50 text-emerald-600 border-emerald-100",
     Completada: "bg-emerald-50 text-emerald-600 border-emerald-100",
+    Completado: "bg-emerald-50 text-emerald-600 border-emerald-100",
   };
 
   return (
     <span className={`text-[10px] font-black uppercase px-3 py-1.5 rounded-xl border ${styles[estado] || "bg-gray-50 text-gray-400 border-gray-100"}`}>
-      {estado}
+      {estado || "S/N"}
     </span>
   );
 };

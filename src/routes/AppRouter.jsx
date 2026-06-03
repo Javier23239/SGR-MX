@@ -43,11 +43,11 @@ const AppRouter = () => {
         <Route path="usuarios" element={<Usuarios />} />
       </Route>
 
-      {/* RUTAS DE CIUDADANO */}
+      {/* RUTAS DE CIUDADANO - CORREGIDO: Ahora pide el rol CIUDADANO */}
       <Route
         path="/ciudadano"
         element={
-          <ProtectedRoute role="CIUDADANO">
+          <ProtectedRoute role="CIUDADANO"> 
             <MainLayout />
           </ProtectedRoute>
         }
@@ -72,7 +72,16 @@ const AppRouter = () => {
         <Route path="mapa" element={<MapaRuta/>} />
       </Route>
 
-      <Route path="*" element={<div className="p-10 text-center"><h1>404 - Página no encontrada</h1></div>} />
+      {/* RUTA ERROR */}
+      <Route path="*" element={
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="text-center p-10 bg-white rounded-3xl shadow-xl border border-gray-100">
+            <h1 className="text-6xl font-black text-emerald-600 mb-4">404</h1>
+            <p className="text-xl font-bold text-gray-800">Página no encontrada</p>
+            <p className="text-gray-500 mt-2">Parece que te has perdido en el sistema.</p>
+          </div>
+        </div>
+      } />
     </Routes>
   );
 };

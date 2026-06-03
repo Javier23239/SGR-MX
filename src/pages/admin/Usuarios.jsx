@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import RegistrarUsuario from "./RegistrarUsuario"; 
+import { useAuth } from "../../context/AuthContext"; 
 import { 
   RiUserSettingsLine, 
   RiMailLine, 
@@ -15,15 +16,24 @@ const Usuarios = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [filtro, setFiltro] = useState("");
   const [cargando, setCargando] = useState(true);
+  const { user } = useAuth(); 
 
-  useEffect(() => {
-    cargarUsuarios();
-  }, []);
-
-  const cargarUsuarios = async () => {
+  const cargarUsuarios = useCallback(async () => {
+    if (!user?.token) return;
+    
     try {
       setCargando(true);
-      const response = await fetch("http://localhost:5000/usuarios"); 
+      const response = await fetch("http://localhost:5000/usuarios", {
+        headers: {
+          "Authorization": `Bearer ${user.token}` 
+        }
+      }); 
+      
+      if (response.status === 403) {
+        console.error("Acceso denegado: Token inválido o expirado");
+        return;
+      }
+
       const data = await response.json();
       setUsuarios(Array.isArray(data) ? data : []);
     } catch (error) {
@@ -31,7 +41,11 @@ const Usuarios = () => {
     } finally {
       setCargando(false);
     }
-  };
+  }, [user?.token]);
+
+  useEffect(() => {
+    cargarUsuarios();
+  }, [cargarUsuarios]);
 
   const eliminarUsuario = async (u) => {
     const rol = u.ROL || u.rol;
@@ -46,7 +60,10 @@ const Usuarios = () => {
 
     try {
       const response = await fetch(`http://localhost:5000/usuarios/${id}/${rol}`, { 
-        method: 'DELETE' 
+        method: 'DELETE',
+        headers: {
+          "Authorization": `Bearer ${user.token}` 
+        }
       });
       
       const data = await response.json();
@@ -64,14 +81,15 @@ const Usuarios = () => {
   const usuariosFiltrados = usuarios.filter(u => {
     const term = filtro.toLowerCase();
     const nombre = (u.NOMBRE || "").toLowerCase();
+    const apellido = (u.APELLIDO || "").toLowerCase();
     const email = (u.CORREO || "").toLowerCase();
-    return nombre.includes(term) || email.includes(term);
+    return nombre.includes(term) || apellido.includes(term) || email.includes(term);
   });
 
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-8 animate-fadeIn">
       
-      {/* HEADER PRINCIPAL */}
+      {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
         <div>
           <h1 className="text-3xl font-black text-gray-800 flex items-center gap-3">
@@ -96,9 +114,6 @@ const Usuarios = () => {
         </div>
         <div className="max-w-4xl"> 
           <RegistrarUsuario onUsuarioRegistrado={cargarUsuarios} />
-        </div>
-        <div className="absolute top-0 right-0 p-10 opacity-[0.03] pointer-events-none">
-          <RiUserAddLine size={120} />
         </div>
       </section>
 
@@ -139,10 +154,10 @@ const Usuarios = () => {
                   </tr>
                 ) : (
                   usuariosFiltrados.map((u, i) => (
-                    <tr key={i} className="hover:bg-emerald-50/30 transition-colors group">
+                    <tr key={u.ID || i} className="hover:bg-emerald-50/30 transition-colors group">
                       <td className="px-6 py-5">
                         <div className="flex items-center gap-4">
-                          <div className="w-11 h-11 rounded-xl bg-white border border-gray-100 text-emerald-600 flex items-center justify-center font-black text-xs shadow-sm group-hover:bg-emerald-600 group-hover:text-white transition-all">
+                          <div className="w-11 h-11 rounded-xl bg-white border border-gray-100 text-emerald-600 flex items-center justify-center font-black text-xs shadow-sm group-hover:bg-emerald-600 group-hover:text-white transition-all uppercase">
                             {(u.NOMBRE || "U").charAt(0)}{(u.APELLIDO || "").charAt(0)}
                           </div>
                           <div className="min-w-0">
@@ -159,7 +174,7 @@ const Usuarios = () => {
                             <RiMailLine className="text-emerald-500" /> {u.CORREO}
                           </div>
                           <div className="flex items-center gap-2 text-[10px] text-gray-400">
-                            <RiMapPinLine /> {u.DIRECCION || 'N/A'}
+                            <RiMapPinLine /> {u.DIRECCION || 'Sin dirección registrada'}
                           </div>
                         </div>
                       </td>

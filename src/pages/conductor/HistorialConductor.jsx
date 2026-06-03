@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { reportService } from "../../services/report.service";
 import { useAuth } from "../../context/AuthContext";
 import { 
@@ -16,22 +16,23 @@ const HistorialConductor = () => {
   const [cargando, setCargando] = useState(true);
   const { user } = useAuth();
 
-  useEffect(() => {
-    const cargarHistorial = async () => {
-      if (!user?.email) return;
-      try {
-        setCargando(true);
-        const data = await reportService.getHistoryByEmail(user.email);
-        setRutas(data);
-      } catch (error) {
-        console.error("Error al cargar historial:", error);
-      } finally {
-        setCargando(false);
-      }
-    };
+  const cargarHistorial = useCallback(async () => {
+    if (!user?.email || !user?.token) return;
 
+    try {
+      setCargando(true);
+      const data = await reportService.getHistoryByEmail(user.email, user.token);
+      setRutas(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Error al cargar historial:", error);
+    } finally {
+      setCargando(false);
+    }
+  }, [user?.email, user?.token]);
+
+  useEffect(() => {
     cargarHistorial();
-  }, [user]);
+  }, [cargarHistorial]);
 
   if (cargando) {
     return (
@@ -45,7 +46,7 @@ const HistorialConductor = () => {
   return (
     <div className="max-w-4xl mx-auto p-4 md:p-8 space-y-8 animate-fadeIn">
       
-      {/* Header*/}
+      {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100 relative overflow-hidden">
         <div className="relative z-10">
           <h2 className="text-3xl font-black text-gray-800 flex items-center gap-3">
@@ -60,7 +61,7 @@ const HistorialConductor = () => {
         <RiFileShield2Line className="absolute -right-4 -bottom-4 text-emerald-500/5 size-32" />
       </div>
 
-      {/* Listado */}
+      {/* Listado de Rutas */}
       {rutas.length === 0 ? (
         <div className="bg-white p-16 rounded-[2rem] border-2 border-dashed border-gray-100 text-center">
           <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -82,7 +83,7 @@ const HistorialConductor = () => {
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <span className="bg-emerald-100 text-emerald-700 text-[10px] font-black px-2.5 py-1 rounded-lg uppercase flex items-center gap-1">
-                      <RiCheckboxCircleLine size={14} /> {r.ESTADO || 'Completado'} 
+                      <RiCheckboxCircleLine size={14} /> {r.ESTADO || 'COMPLETADA'} 
                     </span>
                     <span className="text-[10px] font-mono text-gray-400 flex items-center gap-1">
                       <RiHashtag /> {r.ID_SOLICITUD}
@@ -91,11 +92,12 @@ const HistorialConductor = () => {
 
                   <div>
                     <h3 className="font-black text-gray-800 text-lg leading-tight">
-                      {r.DESCRIPCION || 'Sin descripción del reporte'}
+                      {/* Limpiamos la descripción si viene con el formato [Tipo] - Texto | Referencia */}
+                      {r.DESCRIPCION ? r.DESCRIPCION.split('|')[0].replace(/[[\]]/g, '') : 'Sin descripción'}
                     </h3>
                     <div className="flex items-center gap-2 text-gray-500 mt-2 text-sm font-medium">
                       <RiMapPinLine className="text-emerald-500" />
-                      {r.DIRECCION || 'Ubicación registrada'}
+                      {r.DIRECCION || 'Ubicación registrada vía GPS'}
                     </div>
                   </div>
                 </div>

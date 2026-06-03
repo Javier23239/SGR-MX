@@ -4,11 +4,13 @@ const API_URL = 'http://localhost:5000';
 
 export const reportService = {
 
-  // --- METODOS ---
+  // ---  RECOLECTOR ---
 
-  getTasksByEmail: async (email) => {
+  getTasksByEmail: async (email, token) => {
     try {
-      const res = await axios.get(`${API_URL}/recolector/mis-tareas/${email}`);
+      const res = await axios.get(`${API_URL}/recolector/mis-tareas/${email}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       return res.data; 
     } catch (error) {
       console.error("Error al obtener tareas:", error);
@@ -16,9 +18,11 @@ export const reportService = {
     }
   },
 
-  getHistoryByEmail: async (email) => {
+  getHistoryByEmail: async (email, token) => {
     try {
-      const res = await axios.get(`${API_URL}/recolector/historial/${email}`);
+      const res = await axios.get(`${API_URL}/recolector/historial/${email}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       return res.data;
     } catch (error) {
       console.error("Error al obtener historial:", error);
@@ -26,11 +30,13 @@ export const reportService = {
     }
   },
 
-  updateStatus: async (id_solicitud, nuevo_estado) => {
+  updateStatus: async (id_solicitud, nuevo_estado, token) => {
     try {
       const res = await axios.put(`${API_URL}/recolector/actualizar-estado`, {
         id_solicitud,
         nuevo_estado
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
       });
       return res.data;
     } catch (error) {
@@ -40,11 +46,13 @@ export const reportService = {
   },
 
 
-  // METODOS PARA EL ADMINISTRADOR ---
+  // --- ADMINISTRADOR ---
 
-  getAll: async () => {
+  getAll: async (token) => {
     try {
-      const res = await axios.get(`${API_URL}/admin/reportes`);
+      const res = await axios.get(`${API_URL}/admin/reportes`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       return res.data;
     } catch (error) {
       console.error("Error en getAll:", error);
@@ -52,9 +60,11 @@ export const reportService = {
     }
   },
 
-  getAllAdmin: async () => {
+  getAllAdmin: async (token) => {
     try {
-      const res = await axios.get(`${API_URL}/admin/reportes`);
+      const res = await axios.get(`${API_URL}/admin/reportes`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       return res.data;
     } catch (error) {
       console.error("Error al obtener reportes generales:", error);
@@ -62,15 +72,31 @@ export const reportService = {
     }
   },
 
-  assignReport: async (id_solicitud, id_recolector) => {
+  assignReport: async (id_solicitud, id_recolector, token) => {
     try {
       const res = await axios.put(`${API_URL}/admin/asignar-reporte`, {
         id_solicitud,
         id_recolector
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
       });
       return res.data;
     } catch (error) {
       console.error("Error al asignar reporte:", error);
+      throw error;
+    }
+  },
+
+  // ---  CIUDADANO  ---
+
+  getByEmail: async (email, token) => {
+    try {
+      const res = await axios.get(`${API_URL}/solicitudes/${email}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return res.data;
+    } catch (error) {
+      console.error("Error al obtener reportes del ciudadano:", error);
       throw error;
     }
   }

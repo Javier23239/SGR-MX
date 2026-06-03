@@ -3,36 +3,108 @@ import axios from 'axios';
 const API_URL = 'http://localhost:5000';
 
 export const reportService = {
-  create: async (reportData) => {
-    const res = await axios.post(`${API_URL}/solicitudes`, reportData);
-    return res.data;
+
+  // --- CIUDADANO ---
+
+  create: async (reportData, token) => {
+    try {
+      const res = await axios.post(`${API_URL}/solicitudes`, reportData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return res.data;
+    } catch (error) {
+      console.error("Error al crear reporte:", error);
+      throw error;
+    }
   },
 
-  // Admin: Ver todos los reportes 
-  getAllAdmin: async () => {
-    const res = await axios.get(`${API_URL}/admin/reportes`);
-    return Array.isArray(res.data) ? res.data : [];
+  getByEmail: async (email, token) => {
+    try {
+      const res = await axios.get(`${API_URL}/solicitudes/${email}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return res.data;
+    } catch (error) {
+      console.error("Error al obtener reportes del ciudadano:", error);
+      throw error;
+    }
   },
 
-  // Conductor: Ver sus tareas
-  getTasksByEmail: async (email) => {
-    const res = await axios.get(`${API_URL}/recolector/mis-tareas/${email}`);
-    return res.data;
+ // -- RECOLECTOR --
+
+  getTasksByEmail: async (email, token) => {
+    try {
+      const res = await axios.get(`${API_URL}/recolector/mis-tareas/${email}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return res.data;
+    } catch (error) {
+      console.error("Error en getTasksByEmail:", error);
+      throw error;
+    }
   },
 
-  // Actualizar estados 
-  updateStatus: async (id, estado) => {
-    return await axios.put(`${API_URL}/recolector/actualizar-estado`, {
-      id_solicitud: id,
-      nuevo_estado: estado
-    });
+  
+  getHistoryByEmail: async (email, token) => {
+    try {
+      const res = await axios.get(`${API_URL}/recolector/historial/${email}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return res.data;
+    } catch (error) {
+      console.error("Error en getHistoryByEmail:", error);
+      throw error;
+    }
   },
 
-  // Admin: Asignar conductor 
-  assignReport: async (id_solicitud, id_recolector) => {
-    return await axios.put(`${API_URL}/admin/asignar-reporte`, {
-      id_solicitud,
-      id_recolector
-    });
+  // Actualizar estado 
+  updateStatus: async (id, estado, token) => {
+    try {
+      const res = await axios.put(`${API_URL}/recolector/actualizar-estado`, 
+        {
+          id_solicitud: id,
+          nuevo_estado: estado
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      return res.data;
+    } catch (error) {
+      console.error("Error en updateStatus:", error);
+      throw error;
+    }
+  },
+
+// -- ADMINISTRADOR --
+
+  getAllAdmin: async (token) => {
+    try {
+      const res = await axios.get(`${API_URL}/admin/reportes`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return Array.isArray(res.data) ? res.data : [];
+    } catch (error) {
+      console.error("Error en getAllAdmin:", error);
+      throw error;
+    }
+  },
+
+  assignReport: async (id_solicitud, id_recolector, token) => {
+    try {
+      const res = await axios.put(`${API_URL}/admin/asignar-reporte`, 
+        {
+          id_solicitud,
+          id_recolector
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      return res.data;
+    } catch (error) {
+      console.error("Error en assignReport:", error);
+      throw error;
+    }
   }
 };

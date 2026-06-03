@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { reportService } from "../../api/reportes.api"; 
+import { useAuth } from "../../context/AuthContext"; 
 import { 
   RiFileList3Line, 
   RiSearchLine, 
@@ -10,18 +11,26 @@ import {
 } from "react-icons/ri";
 
 const GestionReportes = () => {
+  const { user } = useAuth(); 
   const [reportes, setReportes] = useState([]);
   const [busqueda, setBusqueda] = useState("");
   const [conductores, setConductores] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const cargarDatos = useCallback(async () => {
+    if (!user?.token) return; 
+
     try {
       setLoading(true);
-      const dataRep = await reportService.getAllAdmin();
+      
+      const dataRep = await reportService.getAllAdmin(user.token);
       setReportes(Array.isArray(dataRep) ? dataRep : []);
 
-      const resUser = await fetch("http://localhost:5000/usuarios");
+      const resUser = await fetch("http://localhost:5000/usuarios", {
+        headers: {
+          "Authorization": `Bearer ${user.token}` 
+        }
+      });
       const dataUser = await resUser.json();
       
       if (Array.isArray(dataUser)) {
@@ -31,23 +40,23 @@ const GestionReportes = () => {
         setConductores(soloConductores);
       }
     } catch (error) {
-      console.error("Error al cargar datos:", error);
+      console.error("Error al cargar datos en Gestión:", error);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user?.token]);
 
   useEffect(() => {
     cargarDatos();
   }, [cargarDatos]);
 
   const manejarAsignacion = async (idSolicitud, idRecolector) => {
-    if (!idRecolector) return;
+    if (!idRecolector || !user?.token) return;
 
     try {
-      await reportService.assignReport(idSolicitud, idRecolector);
+      await reportService.assignReport(idSolicitud, idRecolector, user.token);
       
-      alert("✅ Conductor asignado con éxito");
+      alert(" Conductor asignado con Exito en Oracle");
       await cargarDatos(); 
     } catch (error) {
       console.error("Error al asignar:", error);
@@ -66,7 +75,7 @@ const GestionReportes = () => {
     return (
       <div className="flex flex-col items-center justify-center p-20">
         <RiDatabase2Line className="text-5xl text-emerald-500 animate-pulse mb-4" />
-        <span className="text-xs font-black text-gray-400 uppercase tracking-widest">Conectando con Oracle Cloud...</span>
+        <span className="text-xs font-black text-gray-400 uppercase tracking-widest">Sincronizando con Oracle Cloud...</span>
       </div>
     );
   }
@@ -87,7 +96,7 @@ const GestionReportes = () => {
           <RiSearchLine className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500" />
           <input
             type="text"
-            placeholder="Filtrar reportes..."
+            placeholder="Filtrar por reporte o ciudadano..."
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
             className="w-full pl-12 pr-4 py-3 bg-gray-50 border-transparent focus:bg-white focus:border-emerald-500 border-2 rounded-2xl outline-none transition-all font-medium text-gray-700"
@@ -95,11 +104,11 @@ const GestionReportes = () => {
         </div>
       </div>
 
-      {/*Reportes */}
+      {/* Reportes */}
       <div className="grid grid-cols-1 gap-4">
         {reportesFiltrados.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-3xl border-2 border-dashed border-gray-100">
-             <p className="text-gray-400 font-bold italic">No se encontraron registros.</p>
+             <p className="text-gray-400 font-bold italic">No se encontraron registros en la base de datos.</p>
           </div>
         ) : (
           reportesFiltrados.map((r) => {

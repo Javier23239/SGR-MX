@@ -15,6 +15,12 @@ const Navbar = ({ toggleSidebar }) => {
     window.location.href = "/";
   };
 
+  const formatRole = (role) => {
+    if (!role) return "CIUDADANO";
+    if (role === "VECINO") return "CIUDADANO"; 
+    return role;
+  };
+
   return (
     <header className="h-16 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-6 sticky top-0 z-40">
       
@@ -36,10 +42,8 @@ const Navbar = ({ toggleSidebar }) => {
         </div>
       </div>
 
-      {/* Usuario y Acciones */}
       <div className="flex items-center gap-3">
         
-        {/* Iconos de apoyo */}
         <div className="hidden sm:flex items-center gap-1 border-r border-gray-100 pr-3 mr-1">
           <button className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all">
             <RiNotification3Line className="text-xl" />
@@ -49,14 +53,14 @@ const Navbar = ({ toggleSidebar }) => {
           </button>
         </div>
 
-        {/* Perfil de Usuario */}
+        {/* Perfil  */}
         <div className="flex items-center gap-3 pl-2">
           <div className="text-right hidden sm:block">
             <p className="text-xs font-black text-gray-800 leading-none">
               {user?.nombre || "Usuario"}
             </p>
             <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mt-1">
-              {user?.rol || "Ciudadano"}
+              {formatRole(user?.rol)}
             </p>
           </div>
 

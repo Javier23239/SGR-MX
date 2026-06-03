@@ -23,15 +23,17 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const rol = await login(email.trim(), password);
+      const userData = await login(email.trim(), password);
       
-      if (rol === "ADMIN") {
+   
+      if (userData.rol === "ADMIN") {
         navigate("/admin");
-      } else if (rol === "CIUDADANO") {
-        navigate("/ciudadano");
-      } else if (rol === "RECOLECTOR") { 
+      } else if (userData.rol === "RECOLECTOR") {
         navigate("/conductor");
+      } else {
+        navigate("/ciudadano");
       }
+      
     } catch (err) {
       setError(err.message || "Credenciales incorrectas.");
     } finally {
@@ -43,6 +45,7 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4 font-sans">
       <div className="max-w-4xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row border border-gray-100">
         
+        {/* Panel Lateral  */}
         <div className="md:w-1/2 bg-emerald-600 p-12 text-white flex flex-col justify-between relative overflow-hidden">
           <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-emerald-500 rounded-full opacity-50"></div>
           <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-32 h-32 bg-emerald-700 rounded-full opacity-50"></div>
@@ -59,23 +62,26 @@ const Login = () => {
           </div>
         </div>
 
-        {/* Formulario */}
+        {/* Panel del Formulario */}
         <div className="md:w-1/2 p-8 md:p-12">
           <div className="mb-10">
             <h3 className="text-2xl font-black text-gray-800">Iniciar Sesión</h3>
             <p className="text-gray-500 text-sm">Ingresa tus credenciales para continuar.</p>
           </div>
 
+          {/* Alerta de Error */}
           {error && (
-            <div className="mb-6 bg-red-50 border-l-4 border-red-500 text-red-700 text-xs p-4 rounded-r-xl flex items-center gap-3 animate-shake">
-              <RiShieldCheckLine className="text-xl" />
-              {error}
+            <div className="mb-6 bg-red-50 border-l-4 border-red-500 text-red-700 text-xs p-4 rounded-r-xl flex items-center gap-3">
+              <RiShieldCheckLine className="text-xl shrink-0" />
+              <span>{error}</span>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="relative">
-              <label className="text-xs font-black uppercase tracking-widest text-gray-400 mb-2 block">Correo o Usuario</label>
+              <label className="text-xs font-black uppercase tracking-widest text-gray-400 mb-2 block">
+                Correo o Usuario
+              </label>
               <div className="relative">
                 <RiMailLine className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl" />
                 <input
@@ -90,7 +96,9 @@ const Login = () => {
             </div>
 
             <div className="relative">
-              <label className="text-xs font-black uppercase tracking-widest text-gray-400 mb-2 block">Contraseña</label>
+              <label className="text-xs font-black uppercase tracking-widest text-gray-400 mb-2 block">
+                Contraseña
+              </label>
               <div className="relative">
                 <RiLockPasswordLine className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl" />
                 <input
@@ -107,7 +115,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-emerald-600 text-white py-4 rounded-xl font-bold hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-200 flex items-center justify-center gap-2 group"
+              className="w-full bg-emerald-600 text-white py-4 rounded-xl font-bold hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-200 flex items-center justify-center gap-2 group disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {isLoading ? "Validando..." : "Ingresar al Sistema"}
               {!isLoading && <RiArrowRightLine className="group-hover:translate-x-1 transition-transform" />}
@@ -116,7 +124,7 @@ const Login = () => {
 
           <div className="mt-10 text-center">
             <p className="text-sm text-gray-500">
-              ¿Eres nuevo vecino?{" "}
+              ¿Eres nuevo Usuario?{" "}
               <button 
                 onClick={() => navigate("/registro-ciudadano")} 
                 className="text-emerald-600 font-black hover:underline underline-offset-4"

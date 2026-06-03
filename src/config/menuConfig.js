@@ -2,23 +2,30 @@ import {
   RiNavigationFill,
   RiDashboardLine, 
   RiRouteLine, 
-  RiHistoryLine 
+  RiHistoryLine,
+  RiHome4Line,       
+  RiFileList3Line,
+  RiAddCircleLine,
+  RiGroupLine,
+  RiFileSettingsLine
 } from "react-icons/ri";
 
 export const menuConfig = {
+  // --- ADMINISTRADOR ---
   ADMIN: [
-    { label: "Dashboard", path: "/admin" },
-    { label: "Usuarios", path: "/admin/usuarios" },
-    { label: "Reportes", path: "/admin/reportes" },
+    { label: "Dashboard", path: "/admin", icon: RiDashboardLine },
+    { label: "Usuarios", path: "/admin/usuarios", icon: RiGroupLine },
+    { label: "Reportes", path: "/admin/reportes", icon: RiFileSettingsLine },
   ],
 
+  // --- CIUDADANO  ---
   CIUDADANO: [
-    { label: "Dashboard", path: "/ciudadano" },
-    { label: "Mis reportes", path: "/ciudadano/reportes" },
-    { label: "Nuevo reporte", path: "/ciudadano/reportes/nuevo" },
+    { label: "Dashboard", path: "/ciudadano", icon: RiHome4Line },
+    { label: "Mis reportes", path: "/ciudadano/reportes", icon: RiFileList3Line },
+    { label: "Nuevo reporte", path: "/ciudadano/reportes/nuevo", icon: RiAddCircleLine },
   ],
 
-
+  // --- RECOLECTOR ---
   RECOLECTOR: [
     { 
       label: "Dashboard", 
@@ -36,9 +43,9 @@ export const menuConfig = {
       icon: RiHistoryLine 
     },
     {
-  label: "Mapa de Ruta", 
-  path: "/conductor/mapa", 
-  icon: RiNavigationFill 
-},
+      label: "Mapa de Ruta", 
+      path: "/conductor/mapa", 
+      icon: RiNavigationFill 
+    },
   ],
 };

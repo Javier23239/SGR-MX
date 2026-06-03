@@ -12,7 +12,13 @@ const ProtectedRoute = ({ children, role }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (role && user.rol !== role) {
+  
+  const userRole = (user.rol || user.ROL || "").toString().toUpperCase();
+  const requiredRole = (role || "").toString().toUpperCase();
+
+  if (requiredRole && userRole !== requiredRole) {
+    console.warn(`Acceso Denegado. Rol usuario: ${userRole}, Rol requerido: ${requiredRole}`);
+    
     return <Navigate to="/" replace />;
   }
 

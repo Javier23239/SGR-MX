@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { 
   RiHistoryLine, 
@@ -14,23 +14,35 @@ const ReportesCiudadano = () => {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
-  useEffect(() => {
-    const fetchHistorial = async () => {
-      if (!user?.email) return;
-      try {
-        setLoading(true);
-        const response = await fetch(`http://localhost:5000/solicitudes/${user.email}`);
-        const data = await response.json();
-        setReportes(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error("Error al cargar el historial:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchHistorial = useCallback(async () => {
+    if (!user?.email || !user?.token) return;
 
+    try {
+      setLoading(true);
+      const response = await fetch(`http://localhost:5000/solicitudes/${user.email}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.token}` 
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error servidor: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setReportes(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Error al cargar el historial:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [user?.email, user?.token]);
+
+  useEffect(() => {
     fetchHistorial();
-  }, [user]);
+  }, [fetchHistorial]);
 
   if (loading) {
     return (
@@ -83,8 +95,6 @@ const ReportesCiudadano = () => {
                     </span>
                     <EstadoBadge estado={estado} />
                   </div>
-
-                  
 
                   <div className="space-y-4">
                     <div className="flex items-start gap-3">

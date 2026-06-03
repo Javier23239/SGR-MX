@@ -20,7 +20,7 @@ const RegistroCiudadano = () => {
     password: "",
     direccion: "",
     telefono: "",
-    rol: "VECINO" 
+    rol: "CIUDADANO" 
   });
   
   const [isLoading, setIsLoading] = useState(false);
